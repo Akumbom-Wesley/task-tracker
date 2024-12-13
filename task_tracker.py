@@ -96,6 +96,21 @@ def update_task(task_id, description=None, status=None):
     # If task is not found
     print(f"Error: Task with ID {task_id} not found.")
 
+def delete_task(task_id):
+    tasks = load_tasks()
+
+    # Filter out the task with the given ID
+    filtered_tasks = [task for task in tasks if task["id"] != task_id]
+
+    # Check if a task was actually removed
+    if len(filtered_tasks) == len(tasks):
+        print(f"Error: Task with ID {task_id} not found.")
+        return
+
+    # Save the updated list back to the file
+    save_tasks(filtered_tasks)
+    print(f"Task ID {task_id} deleted successfully.")
+
 
 # Save tasks to the file
 def save_tasks(tasks):
@@ -164,6 +179,18 @@ def main():
         update_task(task_id, description, status)
 
 
+    elif command == "delete":
+        if len(args) < 2:
+            print("Error: Missing task ID")
+            return
+        try:
+            task_id = int(args[1])
+        except ValueError:
+            print("Error: Task ID must be a number.")
+            return
+
+        delete_task(task_id)
+    
     else:
         print(f"Unknown command: {command}")
 
