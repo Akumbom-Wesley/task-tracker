@@ -1,1 +1,9 @@
-[]
+[
+    {
+        "id": 1,
+        "description": "Write the project documentation",
+        "status": "todo",
+        "created_at": "2024-12-13T12:15:14.594220",
+        "updated_at": "2024-12-13T12:15:14.594220"
+    }
+]

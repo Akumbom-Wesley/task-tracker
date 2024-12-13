@@ -12,6 +12,27 @@ def initialize_task_file():
         with open(TASKS_FILE, "w") as file:
             json.dump([], file)
 
+# Add tasks to file
+def add_task(description):
+    tasks = load_tasks()
+
+    #Genereate a unique ID (incremental based on the last task's ID)
+    task_id = max((task["id"] for task in tasks), default=0) + 1
+
+    #Create a new task
+    new_task = {
+        "id": task_id,
+        "description": description,
+        "status": "todo",
+        "created_at": datetime.now().isoformat(),
+        "updated_at": datetime.now().isoformat()
+    }
+
+    # Add the new task to the list and save it
+    tasks.append(new_task)
+    save_tasks(tasks)
+
+    print(f"Task added: {new_task['description']} (ID: {new_task['id']})")
 # Load tasks from the file
 def load_tasks():
     with open(TASKS_FILE, "r") as file:
@@ -33,7 +54,12 @@ def main():
 
     command = args[0]
     if command == "add":
-        print("Add task logic here")
+        if len(args) < 2:
+            print("Error: Missing task description.")
+            return
+        description = " ".join(args[1:])
+        add_task(description)
+
     elif command == "list":
         print("List tasks logic here")
     else:
