@@ -68,6 +68,35 @@ def list_tasks(status=None):
         print(f"{task['id']:<5}{task['description']:<30}{task['status']:<15}{task['createdAt']:<25}{task['updatedAt']:<25}")
 
 
+def update_task(task_id, description=None, status=None):
+    tasks = load_tasks()
+
+    # Find the task with the given ID
+    for task in tasks:
+        if task["id"] == task_id:
+            # Update description if provided
+            if description:
+                task["description"] = description
+
+            # Update status if provided
+            if status:
+                if status not in ["todo", "in-progress", "done"]:
+                    print("Error: Invalid status. Use 'todo', 'in-progress', or 'done'.")
+                    return
+                task["status"] = status
+
+            # Update the updatedAt timestamp
+            task["updatedAt"] = datetime.now().isoformat()
+
+            # Save the tasks back to the file
+            save_tasks(tasks)
+            print(f"Task ID {task_id} updated successfully.")
+            return
+
+    # If task is not found
+    print(f"Error: Task with ID {task_id} not found.")
+
+
 # Save tasks to the file
 def save_tasks(tasks):
     with open(TASKS_FILE, "w") as file:
@@ -99,9 +128,44 @@ def main():
                 print("Error: Invalid status. Use 'todo', 'in-progress', or 'done'.")
             else:
                 list_tasks(status)
+                
         else:
             print("Error: Invalid usage. Use 'list' or 'list [status]'.")
 
+    elif command == "update":
+        if len(args) < 2:
+            print("Error: Missing task ID")
+            return
+        try:
+            task_id = int(args[1])
+        except ValueError:
+            print("Error: Task ID must be a number.")
+            return
+
+        # Parse optional arguments for description and status
+        description = None
+        status = None
+        if "--description" in args:
+            desc_index = args.index("--description") + 1
+            if desc_index < len(args):
+                description = " ".join(args[desc_index:])
+            else:
+                print("Error: Missing value for --description.")
+                return
+
+        if "--status" in args:
+            status_index = args.index("--status") + 1
+            if status_index < len(args):
+                status = args[status_index]
+            else:
+                print("Error: Missing value for --status.")
+                return
+
+        update_task(task_id, description, status)
+
+
+    else:
+        print(f"Unknown command: {command}")
 
 if __name__ == "__main__":
     main()
