@@ -16,7 +16,7 @@ python task_tracker.py add "Task description"
 python task_tracker.py list
 python task_tracker.py update [id] --description "Updated description" --status done
 python task_tracker.py delete [id]
-
+```
 
 ## Requirements
 Python 3.x
