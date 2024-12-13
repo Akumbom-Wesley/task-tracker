@@ -36,17 +36,24 @@ def add_task(description):
 
 # Load tasks from the file
 def load_tasks():
-    with open(TASKS_FILE, "r") as file:
-        tasks = json.load(file)
+    try:
+        with open(TASKS_FILE, "r") as file:
+            tasks = json.load(file)
 
-    # Validate and fix missing fields
-    for task in tasks:
-        task.setdefault("createdAt", datetime.now().isoformat())
-        task.setdefault("updatedAt", datetime.now().isoformat())
-        task.setdefault("status", "todo")
+        # Validate and fix missing fields
+        for task in tasks:
+            task.setdefault("createdAt", datetime.now().isoformat())
+            task.setdefault("updatedAt", datetime.now().isoformat())
+            task.setdefault("status", "todo")
 
-    save_tasks(tasks)  # Save any fixed tasks back to the file
-    return tasks
+        return tasks
+    except FileNotFoundError:
+        # If the file doesn't exist, return an empty list
+        return []
+    except json.JSONDecodeError:
+        print("Error: The tasks file is corrupted. Starting with an empty list.")
+        return []
+
 
 
 def list_tasks(status=None):
@@ -58,8 +65,9 @@ def list_tasks(status=None):
 
     # Check if there are tasks to display
     if not tasks:
-        print("No tasks found.")
+        print("No tasks available. Use the 'add' command to create a task.")
         return
+
 
     # Display tasks
     print(f"{'ID':<5}{'Description':<30}{'Status':<15}{'Created At':<25}{'Updated At':<25}")
@@ -101,6 +109,11 @@ def delete_task(task_id):
 
     # Filter out the task with the given ID
     filtered_tasks = [task for task in tasks if task["id"] != task_id]
+
+    if not any(task["id"] == task_id for task in tasks):
+        print(f"Error: Task with ID {task_id} not found.")
+        return
+
 
     # Check if a task was actually removed
     if len(filtered_tasks) == len(tasks):
@@ -190,7 +203,16 @@ def main():
             return
 
         delete_task(task_id)
-    
+
+    elif command == "help":
+        print("Available commands:")
+        print("  add [description]             Add a new task")
+        print("  list [status]                 List tasks (all, todo, in-progress, done)")
+        print("  update [id] [--description]   Update task description")
+        print("         [--status]             Update task status")
+        print("  delete [id]                   Delete a task by ID")
+        print("  help                          Show this help message")
+        
     else:
         print(f"Unknown command: {command}")
 

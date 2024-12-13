@@ -1,9 +1,11 @@
 [
     {
-        "id": 1,
-        "description": "Write the project documentation",
+        "id": 2,
+        "description": "Task to be deleted",
         "status": "todo",
-        "created_at": "2024-12-13T12:15:14.594220",
-        "updated_at": "2024-12-13T12:15:14.594220"
+        "created_at": "2024-12-13T12:29:11.663157",
+        "updated_at": "2024-12-13T12:29:11.663157",
+        "createdAt": "2024-12-13T12:29:15.486457",
+        "updatedAt": "2024-12-13T12:29:15.486457"
     }
 ]
