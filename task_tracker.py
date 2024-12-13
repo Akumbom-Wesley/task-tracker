@@ -33,10 +33,40 @@ def add_task(description):
     save_tasks(tasks)
 
     print(f"Task added: {new_task['description']} (ID: {new_task['id']})")
+
 # Load tasks from the file
 def load_tasks():
     with open(TASKS_FILE, "r") as file:
-        return json.load(file)
+        tasks = json.load(file)
+
+    # Validate and fix missing fields
+    for task in tasks:
+        task.setdefault("createdAt", datetime.now().isoformat())
+        task.setdefault("updatedAt", datetime.now().isoformat())
+        task.setdefault("status", "todo")
+
+    save_tasks(tasks)  # Save any fixed tasks back to the file
+    return tasks
+
+
+def list_tasks(status=None):
+    tasks = load_tasks()
+
+    # Filter tasks by status if specified
+    if status:
+        tasks = [task for task in tasks if task["status"] == status]
+
+    # Check if there are tasks to display
+    if not tasks:
+        print("No tasks found.")
+        return
+
+    # Display tasks
+    print(f"{'ID':<5}{'Description':<30}{'Status':<15}{'Created At':<25}{'Updated At':<25}")
+    print("-" * 100)
+    for task in tasks:
+        print(f"{task['id']:<5}{task['description']:<30}{task['status']:<15}{task['createdAt']:<25}{task['updatedAt']:<25}")
+
 
 # Save tasks to the file
 def save_tasks(tasks):
@@ -61,9 +91,17 @@ def main():
         add_task(description)
 
     elif command == "list":
-        print("List tasks logic here")
-    else:
-        print("Unknown command: {command}")
+        if len(args) == 1:
+            list_tasks()  # List all tasks
+        elif len(args) == 2:
+            status = args[1]
+            if status not in ["todo", "in-progress", "done"]:
+                print("Error: Invalid status. Use 'todo', 'in-progress', or 'done'.")
+            else:
+                list_tasks(status)
+        else:
+            print("Error: Invalid usage. Use 'list' or 'list [status]'.")
+
 
 if __name__ == "__main__":
     main()
